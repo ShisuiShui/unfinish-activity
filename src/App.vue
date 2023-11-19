@@ -67,7 +67,7 @@
                 sidebar: {
                     items: [
                         { id: 'home'   , text: 'Home'      , icon: 'mdi-home'       },
-                        { id: 'Post', text: 'Posts', icon: 'mdi-message-outline' },
+                        { id: 'Post', text: 'Posts', icon: 'mdi-chat' },
                         { id: 'about'  , text: 'About'     , icon: 'mdi-information' },
                         { id: 'contact', text: 'Contact Us', icon: 'mdi-account-box' },
 

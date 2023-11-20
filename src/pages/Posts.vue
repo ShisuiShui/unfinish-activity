@@ -15,7 +15,7 @@
             <img src="dist/assets/images.jfif" alt="" class="image ml-2" />
             <span class="ml-2">Henry</span>
             <v-spacer></v-spacer>
-            <span class="ml-2">{{ formatDate() }}</span>
+            <span class="ml-2">{{ formatDate(post.timestamp) }}</span>
           </v-card-title>
           <v-card-text>
             <v-list>
@@ -45,7 +45,7 @@
                   <v-icon>mdi-account</v-icon>
                   <span class="ml-2">Henry</span>
                   <div class="d-flex justify-end mb-3">
-                    <span class="ml-2">{{ formatDate() }}</span>
+                    <span class="ml-2">{{ formatDate(post.timestamp) }}</span>
                   </div>
                   <!-- react for comments/showing comments -->
                   <v-list-item-content>{{ comment }}</v-list-item-content>
@@ -84,7 +84,11 @@ export default defineComponent({
   methods: {
     addPost() {
       if (this.postContent.trim() !== "") {
-        this.posts.unshift(this.postContent);
+        const newPost = {
+          content: this.postContent,
+          timestamp: new Date(), // Add timestamp for the new post
+        };
+        this.posts.unshift(newPost);
         this.likedPosts.unshift(false);
         this.likeCount.unshift(0);
         this.showCommentForm.unshift(false);
@@ -123,8 +127,7 @@ export default defineComponent({
         this.commentInput[index] = "";
       }
     },
-    formatDate() {
-      const now = new Date();
+    formatDate(timestamp) {
       const options = {
         year: "numeric",
         month: "numeric",
@@ -132,8 +135,12 @@ export default defineComponent({
         hour: "numeric",
         minute: "numeric",
         hour12: true,
+
+
       };
-      return now.toLocaleString("en-US", options);
+
+
+      return new Date (timestamp).toLocaleString("en-US", options);
     },
   },
 });

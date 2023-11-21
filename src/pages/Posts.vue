@@ -49,8 +49,8 @@
                   </div>
                   <v-list-item-content>{{ comment.content }}</v-list-item-content>
                   <div class="d-flex justify-end mb-3">
-                    <v-icon @click="togglecomment(index, commentIndex)" :color="commentLiked[index][commentIndex] ? 'red' : 'red' ">mdi-heart</v-icon>
-                    <span class="ml-2">{{ commentLikeCount[index][commentIndex] }}</span>
+                    <v-icon @click="togglecomment(index, commentIndex)" :color="commentLiked[index][commentIndex] ? 'red' : 'gray' ">mdi-heart</v-icon>
+                    <span style="margin-left: 5px;">{{ commentLikeCount[index][commentIndex] || 0 }}</span>
                   </div>
                 </v-list-item>
               </v-list>
@@ -99,32 +99,34 @@ export default defineComponent({
       }
     },
     togglecomment(postIndex, commentIndex) {
-      // If not initialized, set it to 0
-      if (typeof this.commentLikeCount[postIndex][commentIndex] === 'undefined') {
-        this.$set(this.commentLikeCount[postIndex], commentIndex, 0);
+      // If not initialized, set it to false
+      if (typeof this.commentLiked[postIndex] === 'undefined') {
+        this.$set(this.commentLiked, postIndex, false);
       }
 
-      // If not initialized, set it to false
-      if (typeof this.commentLiked[postIndex][commentIndex] === 'undefined') {
-        this.$set(this.commentLiked[postIndex], commentIndex, false);
+      const commentLikedArray = this.commentLiked[postIndex];
+
+      // If not initialized, set it to 0
+      if (typeof commentLikedArray[commentIndex] === 'undefined') {
+        this.$set(commentLikedArray, commentIndex, false);
       }
 
       // Toggle the like status (true or false)
-      this.$set(this.commentLiked[postIndex], commentIndex, !this.commentLiked[postIndex][commentIndex]);
+      commentLikedArray[commentIndex] = !commentLikedArray[commentIndex];
 
       // Update the like count for the specific comment
-      this.$set(
-          this.commentLikeCount[postIndex],
-          commentIndex,
-          this.commentLiked[postIndex][commentIndex]
-              ? this.commentLikeCount[postIndex][commentIndex] + 1
-              : this.commentLikeCount[postIndex][commentIndex] - 1
-      );
+      if (this.commentLikeCount[postIndex]) {
+        const commentLikeCountArray = this.commentLikeCount[postIndex];
+
+        // Update the like count for the specific comment, ensure it doesn't go below 0
+        commentLikeCountArray[commentIndex] = Math.max(0, commentLikeCountArray[commentIndex] + (commentLikedArray[commentIndex] ? 1 : +1));
+      }
     },
+
 
     toggleLike(index) {
       this.likedPosts[index] = !this.likedPosts[index];
-      this.likeCount[index] += this.likedPosts[index] ? 1 : -1; // Update like count based on like status
+      this.likeCount[index] += this.likedPosts[index] ? 1 : +1; // Update like count based on like status
     },
     toggleCommentForm(index) {
       this.showCommentForm[index] = !this.showCommentForm[index];
@@ -137,8 +139,17 @@ export default defineComponent({
           timestamp: new Date(),
         };
         this.comments[index].unshift(newComment);
+
+        // Ensure that commentLiked and commentLikeCount arrays are initialized
+        if (!Array.isArray(this.commentLiked[index])) {
+          this.$set(this.commentLiked, index, []);
+        }
+        if (!Array.isArray(this.commentLikeCount[index])) {
+          this.$set(this.commentLikeCount, index, []);
+        }
+
         this.commentLiked[index].unshift([]);
-        this.commentLikeCount[index].unshift([]);
+        this.commentLikeCount[index].unshift(0); // Initialize the like count to 0
         this.commentInput[index] = "";
       }
     },

@@ -19,7 +19,6 @@
           </v-card-title>
           <v-card-text>
             <v-list>
-
               <v-list-item>
                 <v-list-item-content>{{ post.content }}</v-list-item-content>
               </v-list-item>
@@ -51,8 +50,7 @@
                   <v-list-item-content>{{ comment.content }}</v-list-item-content>
                   <div class="d-flex justify-end mb-3">
                     <v-icon @click="togglecomment(index, commentIndex)" :color="commentLiked[index][commentIndex] ? 'red' : 'red' ">mdi-heart</v-icon>
-                    <span style="margin-left: 5px;">{{ commentLikeCount[index][commentIndex] }}</span>
-
+                    <span class="ml-2">{{ commentLikeCount[index][commentIndex] }}</span>
                   </div>
                 </v-list-item>
               </v-list>
@@ -76,10 +74,10 @@ export default defineComponent({
       likedPosts: [],
       likeCount: [],
       showCommentForm: [],
-      commentInput: [], // Make sure commentInput is an array
+      commentInput: [],
       comments: [],
       commentLiked: [],
-      commentLikeCount: [], // Use an array of arrays for comment like counts
+      commentLikeCount: [],
     };
   },
   methods: {
@@ -87,7 +85,7 @@ export default defineComponent({
       if (this.postContent.trim() !== "") {
         const newPost = {
           content: this.postContent,
-          timestamp: new Date(), // Add timestamp for the new post
+          timestamp: new Date(),
         };
         this.posts.unshift(newPost);
         this.likedPosts.unshift(false);
@@ -100,15 +98,33 @@ export default defineComponent({
         this.postContent = "";
       }
     },
-    togglecomment(index) {
-      this.commentLiked[index] = !this.commentLiked[index];
-      this.commentLikeCount[index] += this.commentLiked[index] ? 1 : +1; // Update like count based on like status
-    },
+    togglecomment(postIndex, commentIndex) {
+      // If not initialized, set it to 0
+      if (typeof this.commentLikeCount[postIndex][commentIndex] === 'undefined') {
+        this.$set(this.commentLikeCount[postIndex], commentIndex, 0);
+      }
 
+      // If not initialized, set it to false
+      if (typeof this.commentLiked[postIndex][commentIndex] === 'undefined') {
+        this.$set(this.commentLiked[postIndex], commentIndex, false);
+      }
+
+      // Toggle the like status (true or false)
+      this.$set(this.commentLiked[postIndex], commentIndex, !this.commentLiked[postIndex][commentIndex]);
+
+      // Update the like count for the specific comment
+      this.$set(
+          this.commentLikeCount[postIndex],
+          commentIndex,
+          this.commentLiked[postIndex][commentIndex]
+              ? this.commentLikeCount[postIndex][commentIndex] + 1
+              : this.commentLikeCount[postIndex][commentIndex] - 1
+      );
+    },
 
     toggleLike(index) {
       this.likedPosts[index] = !this.likedPosts[index];
-      this.likeCount[index] += this.likedPosts[index] ? 1 : +1; // Update like count based on like status
+      this.likeCount[index] += this.likedPosts[index] ? 1 : -1; // Update like count based on like status
     },
     toggleCommentForm(index) {
       this.showCommentForm[index] = !this.showCommentForm[index];
@@ -123,7 +139,7 @@ export default defineComponent({
         this.comments[index].unshift(newComment);
         this.commentLiked[index].unshift([]);
         this.commentLikeCount[index].unshift([]);
-        this.commentInput[index] = ""; // Clear the comment input
+        this.commentInput[index] = "";
       }
     },
     formatDate(timestamp) {
@@ -134,12 +150,9 @@ export default defineComponent({
         hour: "numeric",
         minute: "numeric",
         hour12: true,
-
-
       };
 
-
-      return new Date (timestamp).toLocaleString("en-US", options);
+      return new Date(timestamp).toLocaleString("en-US", options);
     },
   },
 });

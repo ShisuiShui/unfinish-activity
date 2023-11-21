@@ -19,8 +19,9 @@
           </v-card-title>
           <v-card-text>
             <v-list>
+
               <v-list-item>
-                <v-list-item-content>{{ post }}</v-list-item-content>
+                <v-list-item-content>{{ post.content }}</v-list-item-content>
               </v-list-item>
               <div class="d-flex justify-end mb-3">
                 <v-icon @click="toggleLike(index)" :color="likedPosts[index] ? 'red' : 'red' ">mdi-heart</v-icon>
@@ -45,13 +46,13 @@
                   <v-icon>mdi-account</v-icon>
                   <span class="ml-2">Henry</span>
                   <div class="d-flex justify-end mb-3">
-                    <span class="ml-2">{{ formatDate(post.timestamp) }}</span>
+                    <span class="ml-2">{{ formatDate(comment.timestamp) }}</span>
                   </div>
-                  <!-- react for comments/showing comments -->
-                  <v-list-item-content>{{ comment }}</v-list-item-content>
+                  <v-list-item-content>{{ comment.content }}</v-list-item-content>
                   <div class="d-flex justify-end mb-3">
                     <v-icon @click="togglecomment(index, commentIndex)" :color="commentLiked[index][commentIndex] ? 'red' : 'red' ">mdi-heart</v-icon>
                     <span style="margin-left: 5px;">{{ commentLikeCount[index][commentIndex] }}</span>
+
                   </div>
                 </v-list-item>
               </v-list>
@@ -75,7 +76,7 @@ export default defineComponent({
       likedPosts: [],
       likeCount: [],
       showCommentForm: [],
-      commentInput: [],
+      commentInput: [], // Make sure commentInput is an array
       comments: [],
       commentLiked: [],
       commentLikeCount: [], // Use an array of arrays for comment like counts
@@ -99,18 +100,12 @@ export default defineComponent({
         this.postContent = "";
       }
     },
-    togglecomment(postIndex, commentIndex) {
-      this.$set(this.commentLiked[postIndex], commentIndex, !this.commentLiked[postIndex][commentIndex]);
-
-      // Update the like count for the specific comment
-      this.$set(
-          this.commentLikeCount[postIndex],
-          commentIndex,
-          this.commentLiked[postIndex][commentIndex]
-              ? (this.commentLikeCount[postIndex][commentIndex] || 0) + 1
-              : (this.commentLikeCount[postIndex][commentIndex] || 0)
-      );
+    togglecomment(index) {
+      this.commentLiked[index] = !this.commentLiked[index];
+      this.commentLikeCount[index] += this.commentLiked[index] ? 1 : +1; // Update like count based on like status
     },
+
+
     toggleLike(index) {
       this.likedPosts[index] = !this.likedPosts[index];
       this.likeCount[index] += this.likedPosts[index] ? 1 : +1; // Update like count based on like status
@@ -119,12 +114,16 @@ export default defineComponent({
       this.showCommentForm[index] = !this.showCommentForm[index];
     },
     addComment(index) {
-      const comment = this.commentInput[index];
-      if (comment.trim() !== "") {
-        this.comments[index].unshift(comment);
+      const commentText = this.commentInput[index];
+      if (commentText.trim() !== "") {
+        const newComment = {
+          content: commentText,
+          timestamp: new Date(),
+        };
+        this.comments[index].unshift(newComment);
         this.commentLiked[index].unshift([]);
         this.commentLikeCount[index].unshift([]);
-        this.commentInput[index] = "";
+        this.commentInput[index] = ""; // Clear the comment input
       }
     },
     formatDate(timestamp) {

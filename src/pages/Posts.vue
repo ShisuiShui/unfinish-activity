@@ -58,7 +58,7 @@
               <!-- Display comments -->
               <v-list v-if="comments[index].length > 0" style="margin-top: 5px;">
                 <v-list-item v-for="(comment, commentIndex) in comments[index]" :key="commentIndex" style="border: 5px solid #ccc; padding: 5px; margin-bottom: 5px;">
-                  <v-icon>mdi-account</v-icon>
+                  <v-icon><img src="dist/assets/images.jfif" alt="" class="icon ml-2" /></v-icon>
                   <span class="ml-2">Henry</span>
                   <div class="d-flex justify-end mb-3">
                     <span class="ml-2">{{ formatDate(comment.timestamp) }}</span>
